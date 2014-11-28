@@ -1,0 +1,20 @@
+{
+  "name" : "Renis",
+  "version" : "0.0.1",
+  "description" : "Insert's content JS scripts to http://www.renins.com. For development purposes.",
+  "icons": {
+    "128": "./favicon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.renins.com/*"],
+      "js": ["ait.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    "renis.js",
+    "pageWindowSetter.js"
+  ],
+  "manifest_version": 2
+}
