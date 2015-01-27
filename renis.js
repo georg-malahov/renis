@@ -14,7 +14,12 @@
 			isLocalStorage = "localStorage" in window,
 			isCookieEnabled = navigator.cookieEnabled,
 			hash = window.location.hash,
-			id, savedId, pixelIds;
+			id, savedId, pixelIds = {
+				'audience': '315942855252412',
+				'options': '6018043717536',
+				'extra': '6018043717536',
+				'confirm': '6018043717536'
+			};
 
 		function getCookie (name) {
 			var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g,'\\$1') + "=([^;]*)"));
@@ -154,6 +159,9 @@
 
 		function processQueue (queue) {
 			console.info("processQueue: ", queue);
+			if (!queue || Object.prototype.toString.call(queue).indexOf('Array') == -1) {
+				return;
+			}
 			for (var i = 0; i < queue.length; i++) {
 				if (Object.prototype.toString.call(queue[i]).indexOf('Array') > -1) {
 					execTask.apply(this, [queue[i][0], queue[i].slice(1)]);
@@ -183,10 +191,6 @@
 			triggerAudiencePixel(pixelIds.audience);
 			hashProcess(hash);
 			hashChangeSubscribe();
-		};
-
-		this.test = function () {
-			console.info("TEST args: ", arguments);
 		};
 
 		this.setPixelIds = function (pixels) {

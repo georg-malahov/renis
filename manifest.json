@@ -1,6 +1,6 @@
 {
   "name" : "Renis",
-  "version" : "0.0.1",
+  "version" : "0.0.3",
   "description" : "Insert's content JS scripts to http://www.renins.com. For development purposes.",
   "icons": {
     "128": "./favicon128.png"
@@ -14,6 +14,7 @@
   ],
   "web_accessible_resources": [
     "renis.js",
+    "renis.min.js",
     "pageWindowSetter.js"
   ],
   "manifest_version": 2
