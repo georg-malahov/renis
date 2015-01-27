@@ -1,6 +1,6 @@
 {
   "name" : "Renis",
-  "version" : "0.0.3",
+  "version" : "0.0.4",
   "description" : "Insert's content JS scripts to http://www.renins.com. For development purposes.",
   "icons": {
     "128": "./favicon128.png"
