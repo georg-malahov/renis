@@ -7,6 +7,8 @@
 				"redirect": /#edit\/fb\/data/,
 				"options": /#edit\/(?!new|fb).*\/options/,
 				"extra": /#edit\/(?!new|fb).*\/extra/,
+				"order": /#edit\/(?!new|fb).*\/order/,
+				"confirmm": /#edit\/(?!new|fb).*\/confirmm/,
 				"confirm": /#edit\/(?!new|fb).*\/confirm/
 			},
 			memoryKey = "__uid",
@@ -15,10 +17,12 @@
 			isCookieEnabled = navigator.cookieEnabled,
 			hash = window.location.hash,
 			id, savedId, pixelIds = {
-				'audience': '315942855252412',
-				'options': '6018043717536',
-				'extra': '6018043717536',
-				'confirm': '6018043717536'
+				'audience': '1418051851832684',
+				'options': '6022958850356',
+				'extra': '6022958860956',
+				'confirm': '6022958899356',
+				'confirmm': '6022959029556',
+				'order': '6022958867356'
 			};
 
 		function getCookie (name) {
@@ -226,12 +230,28 @@
 			window._fbq.push(['track', pixelIds.extra, {'value':'0.00','currency':'USD'}]);
 		};
 
+		this.order = function (id) {
+			console.info("Order: ", id);
+			console.info("Order pixelIds: ", pixelIds);
+			if (!pixelIds.order) { return; }
+			window._fbq = window._fbq || [];
+			window._fbq.push(['track', pixelIds.order, {'value':'0.00','currency':'USD'}]);
+		};
+
 		this.confirm = function (id) {
 			console.info("Confirm: ", id);
 			console.info("Confirm pixelIds: ", pixelIds);
 			if (!pixelIds.confirm) { return; }
 			window._fbq = window._fbq || [];
 			window._fbq.push(['track', pixelIds.confirm, {'value':'0.00','currency':'USD'}]);
+		};
+
+		this.confirmm = function (id) {
+			console.info("Confirmm: ", id);
+			console.info("Confirmm pixelIds: ", pixelIds);
+			if (!pixelIds.confirmm) { return; }
+			window._fbq = window._fbq || [];
+			window._fbq.push(['track', pixelIds.confirmm, {'value':'0.00','currency':'USD'}]);
 		};
 	}
 	window._ait = new __Renis(window._ait);
