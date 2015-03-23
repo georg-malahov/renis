@@ -255,7 +255,7 @@
 			window._fbq.push(['track', pixelIds.confirmm, {'value':'0.00','currency':'USD'}]);
 		};
 	}
-	if (window._ait.inited) {
+	if (window._ait && window._ait.inited) {
 		return;
 	}
 	window._ait = new __Renis(window._ait);
