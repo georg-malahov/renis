@@ -195,7 +195,6 @@
 			triggerAudiencePixel(pixelIds.audience);
 			hashProcess(hash);
 			hashChangeSubscribe();
-			self.inited = true
 		};
 
 		this.setPixelIds = function (pixels) {
@@ -258,6 +257,7 @@
 	if (window._ait && window._ait.inited) {
 		return;
 	}
+	window._ait.inited = true;
 	window._ait = new __Renis(window._ait);
 	window._ait.init();
 })(window, document, navigator);
