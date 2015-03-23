@@ -1,6 +1,6 @@
 (function (window, document, navigator) {
-	function __Renis (queue) {
-		console.log("Hello from Renis extension. Args: ", queue);
+	function __Renis (_ait) {
+		console.log("Hello from Renis extension. Args: ", _ait);
 		var self = this,
 			idregex = /#edit\/((?!new|fb).*)\/\w*/,
 			actionMatches = {
@@ -191,10 +191,11 @@
 		this.init = function () {
 			console.info("Init Renis!");
 			loadFBpixelCore();
-			processQueue.call(self, queue);
+			processQueue.call(self, _ait);
 			triggerAudiencePixel(pixelIds.audience);
 			hashProcess(hash);
 			hashChangeSubscribe();
+			self.inited = true
 		};
 
 		this.setPixelIds = function (pixels) {
@@ -253,6 +254,9 @@
 			window._fbq = window._fbq || [];
 			window._fbq.push(['track', pixelIds.confirmm, {'value':'0.00','currency':'USD'}]);
 		};
+	}
+	if (window._ait.inited) {
+		return;
 	}
 	window._ait = new __Renis(window._ait);
 	window._ait.init();
