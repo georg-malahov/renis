@@ -1,7 +1,15 @@
 (function (window, document) {
 	function __Renis (_ait) {
 		var self = this,
+			actionMatches = {
+				"redirect": /__fb_true=1/
+			},
+			memoryKey = "__uid",
+			href = window.location.href,
+			isLocalStorage = "localStorage" in window,
+			isCookieEnabled = navigator.cookieEnabled,
 			timeouts = {},
+			savedId,
 			pixelIds = {
 				'_audience': '1418051851832684',
 				'auto': {
@@ -27,6 +35,56 @@
 					}
 				}
 			};
+
+		function setCookie (name, value, options) {
+			options = options || {};
+			var expires = options.expires;
+			if (typeof expires == "number" && expires) {
+				var d = new Date();
+				d.setTime(d.getTime() + expires * 1000);
+				expires = options.expires = d;
+			}
+			if (expires && expires.toUTCString) {
+				options.expires = expires.toUTCString();
+			}
+			value = encodeURIComponent(value);
+			var updatedCookie = name + "=" + value;
+			for (var propName in options) {
+				updatedCookie += "; " + propName;
+				var propValue = options[propName];
+				if (propValue !== true) {
+					updatedCookie += "=" + propValue;
+				}
+			}
+			document.cookie = updatedCookie;
+		}
+
+		function getCookie (name) {
+			var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g,'\\$1') + "=([^;]*)"));
+			return matches ? decodeURIComponent(matches[1]) : undefined;
+		}
+
+		function saveToMemory (key, value) {
+			if (!key || !value) { return; }
+			if (isLocalStorage) {
+				window.localStorage.setItem(key, value);
+			}
+			if (isCookieEnabled) {
+				setCookie(key, value, {expires: 86400 * 365});
+			}
+		}
+
+		function getFromMemory (key) {
+			if (!key) { return; }
+			var localStorageValue, cookieValue;
+			if (isLocalStorage) {
+				localStorageValue = window.localStorage.getItem(key);
+			}
+			if (isCookieEnabled) {
+				cookieValue = getCookie(key);
+			}
+			return localStorageValue || cookieValue || undefined;
+		}
 
 		function loadFBpixelCore() {
 			var _fbq = window._fbq || (window._fbq = []);
@@ -77,11 +135,21 @@
 
 		this.init = function () {
 			processQueue.call(self, _ait);
+
+			if (actionMatches.redirect.test(href)) {
+				savedId = getFromMemory(memoryKey);
+				if (savedId) { self['redirect'](savedId); }
+			}
+
 			window.clearTimeout(timeouts.oninit);
 			timeouts.oninit = window.setTimeout(function () {
 				loadFBpixelCore();
 				triggerAudiencePixel(pixelIds._audience);
 			}, 3000);
+		};
+		this.redirect = function (id) {
+			if (!id) {return;}
+			window.location.search = "?calc_id=" + id;
 		};
 		this.trigger = function (pixelId, value) {
 			if (!pixelId) { return; }
@@ -90,12 +158,14 @@
 			window._fbq.push(['track', pixelId, {'value': value, 'currency':'RUB'}]);
 		};
 		this.track = function (params) {
+			console.info("Should track params: ", params);
 			if (Object.prototype.toString.call(params).indexOf('Object') == -1) {
 				return;
 			}
-			if (!pixelIds[params.calcName]) return;
-			if (!pixelIds[params.calcName][params.page]) return;
-			if (!pixelIds[params.calcName][params.page][params.policyType]) return;
+			if (params.accountNumber) { saveToMemory(memoryKey, params.accountNumber); }
+			if (!pixelIds[params.calcName]) { return; }
+			if (!pixelIds[params.calcName][params.page]) { return; }
+			if (!pixelIds[params.calcName][params.page][params.policyType]) { return; }
 			self.trigger(pixelIds[params.calcName][params.page][params.policyType], params.cost);
 		};
 
