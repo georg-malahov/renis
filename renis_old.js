@@ -197,13 +197,6 @@
 			}
 			pixelIds = pixels;
 		};
-		this.track = function (params) {
-			console.info("Page params to track BEFORE: ", params);
-			if (Object.prototype.toString.call(params).indexOf('Object') == -1) {
-				return;
-			}
-			console.info("Page params to track: ", params);
-		};
 
 		this.redirect = function (id) {
 			if (!id) {return;}
@@ -220,6 +213,8 @@
 		};
 
 	}
+	//Temporarily do nothing in this script, while we develop a new one
+	return
 	if (window._ait && window._ait.inited) {
 		return;
 	}

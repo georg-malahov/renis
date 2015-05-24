@@ -1,13 +1,3 @@
-/* The Code between comments shoult be removed. It's needed obly for development using extension	.*/
-(function() {
-	var pageWindowSetter = document.createElement('script');
-	pageWindowSetter.async = true;
-	pageWindowSetter.src = chrome.extension.getURL("pageWindowSetter.js");
-	var s = document.getElementsByTagName('script')[0];
-	s.parentNode.insertBefore(pageWindowSetter, s);
-})();
-/* Code above should be removed. */
-
 (function() {
 	var _ait = window._ait || (window._ait = []);
 	if (!_ait.loaded) {
