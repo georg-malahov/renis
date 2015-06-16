@@ -15,26 +15,35 @@
 				'auto': {
 					'options': {
 						'casco': '6022958850356',
-						'osago': '6022958850356'
+						'osago': '6022958850356',
+						'osago_casco': '6022958850356'
 					},
 					'extra': {
 						'casco': '6022958860956',
-						'osago': '6022958860956'
+						'osago': '6022958860956',
+						'osago_casco': '6022958860956'
 					},
 					'confirm': {
 						'casco': '6022958899356',
-						'osago': '6022958899356'
+						'osago': '6022958899356',
+						'osago_casco': '6022958899356'
 					},
 					'confirmm': {
 						'casco': '6022959029556',
-						'osago': '6022959029556'
+						'osago': '6022959029556',
+						'osago_casco': '6022959029556'
 					},
 					'order': {
 						'casco': '6022958867356',
-						'osago': '6022958867356'
+						'osago': '6022958867356',
+						'osago_casco': '6022958867356'
 					}
 				}
 			};
+
+		function supports_history_api () {
+			return !!(window.history && window.history.pushState);
+		}
 
 		function setCookie (name, value, options) {
 			options = options || {};
@@ -117,9 +126,7 @@
 		}
 
 		function triggerAudiencePixel (id) {
-			if (!id) {
-				return;
-			}
+			if (!id) {return;}
 			window._fbq = window._fbq || [];
 			window._fbq.push(['addPixelId', id]);
 			window._fbq.push(['track', 'PixelInitialized', {}]);
@@ -163,12 +170,93 @@
 				return;
 			}
 			if (params.accountNumber) { saveToMemory(memoryKey, params.accountNumber); }
+			if (params.page) { self.updateQuery("__fb_page", params.page); }
+			if (!params.policyType) { params.policyType = ""; }
+			var policy = params.policyType.replace(/\+/gi, "_");
+			self.updateQuery("__fb_" + policy, 1);
+			triggerAudiencePixel(pixelIds._audience);
+			window.setTimeout(function () {
+				self.updateQuery("__fb_page");
+				self.updateQuery("__fb_" + policy);
+			}, 1500);
 			if (!pixelIds[params.calcName]) { return; }
 			if (!pixelIds[params.calcName][params.page]) { return; }
-			if (!pixelIds[params.calcName][params.page][params.policyType]) { return; }
-			self.trigger(pixelIds[params.calcName][params.page][params.policyType], params.cost);
+			if (!pixelIds[params.calcName][params.page][policy]) { return; }
+			self.trigger(pixelIds[params.calcName][params.page][policy], params.cost);
 		};
+		this.parseQuery = function (str) {
+			if (typeof str !== 'string') {
+				return {};
+			}
 
+			str = str.trim().replace(/^\?/, '');
+
+			if (!str) {
+				return {};
+			}
+
+			return str.trim().split('&').reduce(function (ret, param) {
+				var parts = param.replace(/\+/g, ' ').split('=');
+				var key = parts[0];
+				var val = parts[1];
+
+				key = decodeURIComponent(key);
+				// missing `=` should be `null`:
+				// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+				val = val === undefined ? null : decodeURIComponent(val);
+
+				if (!ret.hasOwnProperty(key)) {
+					ret[key] = val;
+				} else if (Array.isArray(ret[key])) {
+					ret[key].push(val);
+				} else {
+					ret[key] = [ret[key], val];
+				}
+
+				return ret;
+			}, {});
+		};
+		this.stringifyQuery = function (obj) {
+			return obj ? Object.keys(obj).map(function (key) {
+				var val = obj[key];
+
+				if (Array.isArray(val)) {
+					return val.map(function (val2) {
+						return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+					}).join('&');
+				}
+
+				return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+			}).join('&') : '';
+		};
+		this.pushQuery = function (key, new_value) {
+			if (!supports_history_api() || !key) { return; }
+			var params = self.parseQuery(window.location.search);
+			params[key] = new_value;
+			var new_params_string = self.stringifyQuery(params);
+			window.history.pushState({}, "", window.location.pathname + '?' + new_params_string + window.location.hash);
+		};
+		this.updateQuery = function (key, new_value) {
+			if (!supports_history_api() || !key) { return; }
+			var params = self.parseQuery(window.location.search);
+			params[key] = new_value;
+			if (typeof new_value === "undefined") { delete params[key]; }
+			var new_params_string = self.stringifyQuery(params);
+			window.history.replaceState(window.history.state, "", window.location.pathname + '?' + new_params_string + window.location.hash);
+		};
+		this.removeQueryKeys = function (keys) {
+			if (!supports_history_api()) { return; }
+			var params = self.parseQuery(window.location.search);
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
+				delete params[key];
+			}
+			if (!keys) {
+				params = {};
+			}
+			var new_params_string = self.stringifyQuery(params);
+			window.history.replaceState(window.history.state, "", window.location.pathname + '?' + new_params_string + window.location.hash);
+		};
 	}
 	if (window._ait && window._ait.inited) {
 		return;

@@ -1,0 +1,1 @@
+uglifyjs renis.js -o renis.min.js -m -c drop_debugger=true,dead_code=true,unused=true,join_vars=true,if_return=true,drop_console=true --lint
