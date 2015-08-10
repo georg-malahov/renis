@@ -142,13 +142,14 @@
 
 		this.init = function () {
 			processQueue.call(self, _ait);
-
-			if (actionMatches.redirect.test(href)) {
-				savedId = getFromMemory(memoryKey);
-				if (savedId) { self['redirect'](savedId); }
-			}
-
 			window.clearTimeout(timeouts.oninit);
+			window.clearTimeout(timeouts.onredirect);
+			timeouts.onredirect = window.setTimeout(function () {
+				if (actionMatches.redirect.test(href)) {
+					savedId = getFromMemory(memoryKey);
+					if (savedId) { self['redirect'](savedId); }
+				}
+			}, 1000);
 			timeouts.oninit = window.setTimeout(function () {
 				loadFBpixelCore();
 				triggerAudiencePixel(pixelIds._audience);
@@ -156,7 +157,7 @@
 		};
 		this.redirect = function (id) {
 			if (!id) {return;}
-			window.location.search = "?calc_id=" + id;
+			window.location.search = "?calc_id=" + id + "&utm_source=aitarget&utm_medium=retargeting";
 		};
 		this.trigger = function (pixelId, value) {
 			if (!pixelId) { return; }
